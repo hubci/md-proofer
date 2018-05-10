@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/felicianotech/md-proofer
+    environment:
+      TEST_RESULTS: /tmp/test-results
+    steps:
+      - checkout
+#      - run:
+#          name: "Install Dependencies"
+#          command: |
+#            go get -u github.com/jstemmer/go-junit-report
+#            go get ./...
+#      - run:
+#          name: "Setup"
+#          command: |
+#            mkdir -p $TEST_RESULTS/go-test
+#      - run:
+#          name: "Run Tests"
+#          command: go test -v 2>&1 | tee >(go-junit-report > $TEST_RESULTS/go-test/report.xml)
+      - run:
+          name: "Run File Tests"
+          command: |
+            go get ./...
+            go build
+            if ./md-proofer lint good-test-files/; then
+              echo "md-proofer passed the files. Continue on."
+            else
+              echo "The tests failed, which it shouldn't. Something is wrong."
+              exit 1
+            fi
+
+            if ./md-proofer lint bad-test-files/; then
+              echo "md-proofer returned an exit code of 0, which shouldn't be the case."
+              exit 1
+            else
+              echo "The tests failed, which is what we expected. Continue on."
+            fi
+#      - store_test_results:
+#          path: /tmp/test-results
+#      - store_artifacts:
+#          path: /tmp/test-results
