@@ -78,5 +78,5 @@ jobs:
           at: .
       - run:
           name: "Publish Release on GitHub"
-          commad: |
+          command: |
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT-REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
