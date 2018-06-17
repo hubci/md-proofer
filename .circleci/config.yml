@@ -61,6 +61,8 @@ jobs:
           command: |
             mkdir binaries
             tar cfz md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
+            ls -lah
+            ls -lah binaries
       - persist_to_workspace:
           root: .
           paths:
@@ -75,7 +77,7 @@ jobs:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: .
+          at: ./binaries/
       - run:
           name: "Publish Release on GitHub"
           command: |
