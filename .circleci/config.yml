@@ -60,7 +60,7 @@ jobs:
           name: "Prepare Binaries"
           command: |
             mkdir binaries
-            tar cfz md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
+            tar cfz ./binaries/md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
             ls -lah
             ls -lah binaries
       - persist_to_workspace:
