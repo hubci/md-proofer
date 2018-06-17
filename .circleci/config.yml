@@ -60,7 +60,7 @@ jobs:
           name: "Prepare Binaries"
           command: |
             mkdir binaries
-            tar cfz ./binaries/md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
+            tar cfz ./binaries/md-proofer--${CIRCLE_TAG}--linux-amd64.tar.gz ./md-proofer
       - persist_to_workspace:
           root: .
           paths:
@@ -78,7 +78,4 @@ jobs:
           at: .
       - run:
           name: "Publish Release on GitHub"
-          command: |
-            ls -lah
-            ls -lah binaries
-            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
+          command: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
