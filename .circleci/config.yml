@@ -39,10 +39,18 @@ jobs:
 #          name: "Run Tests"
 #          command: go test -v 2>&1 | tee >(go-junit-report > $TEST_RESULTS/go-test/report.xml)
       - run:
-          name: "Run File Tests"
+          name: "Compile Binary"
           command: |
             go get ./...
-            go build
+
+            if [ ! -z "$CIRCLE_TAG" ]; then
+              go build -ldflags "-X main.version=${CIRCLE_TAG}" .
+            else
+              go build
+            fi
+      - run:
+          name: "Run File Tests"
+          command: |
             if ./md-proofer lint good-test-files/; then
               echo "md-proofer passed the files. Continue on."
             else
