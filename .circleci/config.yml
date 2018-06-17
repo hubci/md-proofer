@@ -75,8 +75,10 @@ jobs:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: ./binaries/
+          at: .
       - run:
           name: "Publish Release on GitHub"
           command: |
+            ls -lah
+            ls -lah binaries
             ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
