@@ -1,3 +1,21 @@
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$
+      - publish-github:
+          context: deploy-public
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$
+          requires:
+            - build
+
 version: 2
 jobs:
   build:
@@ -38,7 +56,27 @@ jobs:
             else
               echo "The tests failed, which is what we expected. Continue on."
             fi
+      - run:
+          name: "Prepare Binaries"
+          command: |
+            mkdir binaries
+            tar cfz md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./binaries
 #      - store_test_results:
 #          path: /tmp/test-results
 #      - store_artifacts:
 #          path: /tmp/test-results
+
+  publish-github:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publish Release on GitHub"
+          commad: |
+            ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT-REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
