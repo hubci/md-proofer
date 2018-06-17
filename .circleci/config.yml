@@ -61,7 +61,7 @@ jobs:
           command: |
             mkdir binaries
             tar cfz md-proofer-${CIRCLE_TAG}-linux-amd64.tar.gz ./md-proofer
-      - persists_to_workspace:
+      - persist_to_workspace:
           root: .
           paths:
             - ./binaries
