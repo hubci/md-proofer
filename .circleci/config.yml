@@ -21,7 +21,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/github.com/felicianotech/md-proofer
     environment:
       TEST_RESULTS: /tmp/test-results
     steps:
@@ -41,8 +40,6 @@ jobs:
       - run:
           name: "Compile Binary"
           command: |
-            go get ./...
-
             if [ ! -z "$CIRCLE_TAG" ]; then
               go build -ldflags "-X main.version=${CIRCLE_TAG}" .
             else
