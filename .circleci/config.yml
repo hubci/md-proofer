@@ -20,10 +20,9 @@ workflows:
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: cimg/go:1.13
     environment:
       CGO_ENABLED: 0
-      TEST_RESULTS: /tmp/test-results
     steps:
       - checkout
       - run:
@@ -62,7 +61,7 @@ jobs:
 
   publish-github:
     docker:
-      - image: cibuilds/github:0.12.0
+      - image: cibuilds/github:0.13.0
     steps:
       - attach_workspace:
           at: .
