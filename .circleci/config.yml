@@ -1,5 +1,6 @@
+version: 2.1
+
 workflows:
-  version: 2
   main:
     jobs:
       - build:
@@ -16,7 +17,6 @@ workflows:
           requires:
             - build
 
-version: 2
 jobs:
   build:
     docker:
@@ -26,18 +26,6 @@ jobs:
       TEST_RESULTS: /tmp/test-results
     steps:
       - checkout
-#      - run:
-#          name: "Install Dependencies"
-#          command: |
-#            go get -u github.com/jstemmer/go-junit-report
-#            go get ./...
-#      - run:
-#          name: "Setup"
-#          command: |
-#            mkdir -p $TEST_RESULTS/go-test
-#      - run:
-#          name: "Run Tests"
-#          command: go test -v 2>&1 | tee >(go-junit-report > $TEST_RESULTS/go-test/report.xml)
       - run:
           name: "Compile Binary"
           command: |
@@ -71,10 +59,6 @@ jobs:
           root: .
           paths:
             - ./binaries
-#      - store_test_results:
-#          path: /tmp/test-results
-#      - store_artifacts:
-#          path: /tmp/test-results
 
   publish-github:
     docker:
