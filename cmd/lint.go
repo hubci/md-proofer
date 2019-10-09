@@ -24,29 +24,18 @@ type T struct {
 var lintCmd = &cobra.Command{
 	Use:   "lint [directory w/ trailing slash]",
 	Short: "Validate code fences",
-	Long: `Validates each code fence in each Markdown file in the directory.
+	Long: `Validates each code fence in each Markdown file in each directory.
 	
 	Currently only supports YAML code fences.`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		directory := args[0]
 		foundError := false
 
-		files, err := ioutil.ReadDir(directory)
+		for _, directory := range args {
 
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, file := range files {
-
-			if !strings.HasSuffix(file.Name(), ".md") {
-				continue
-			}
-
-			if checkFile(directory, file.Name()) {
+			if checkDir(directory) {
 				foundError = true
 			}
 		}
@@ -57,6 +46,31 @@ var lintCmd = &cobra.Command{
 			return nil
 		}
 	},
+}
+
+func checkDir(directory string) bool {
+
+	files, err := ioutil.ReadDir(directory)
+	foundError := false
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Checking directory: %s\n", directory)
+
+	for _, file := range files {
+
+		if !strings.HasSuffix(file.Name(), ".md") {
+			continue
+		}
+
+		if checkFile(directory, file.Name()) {
+			foundError = true
+		}
+	}
+
+	return foundError
 }
 
 func checkFile(directory, doc string) bool {

@@ -49,6 +49,13 @@ jobs:
             else
               echo "The tests failed, which is what we expected. Continue on."
             fi
+
+            if ./md-proofer lint good-test-files/ bad-test-files/; then
+              echo "md-proofer returned an exit code of 0, which shouldn't be the case."
+              exit 1
+            else
+              echo "Some of the tests failed, which is what we expected. Continue on."
+            fi
       - run:
           name: "Prepare Binaries"
           command: |
