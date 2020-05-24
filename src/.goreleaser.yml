@@ -1,0 +1,36 @@
+project_name: md-proofer
+env:
+  - CGO_ENABLED=0
+before:
+  hooks:
+    - go mod download
+builds:
+  -
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+    ldflags:
+      - -s -w -X github.com/felicianotech/md-proofer/main.version={{ .Version }}
+archives:
+  -
+    name_template: "{{ .ProjectName }}_{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - ../LICENSE
+      - ../README.md
+nfpms:
+  -
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    vendor: "HubCI"
+    homepage: "https://github.com/felicianotech/md-proofer"
+    maintainer: "Ricardo N Feliciano <Ricardo@Feliciano.Tech>"
+    description: "https://github.com/felicianotech/md-proofer"
+    license: MIT
+    formats:
+      - deb
+    dependencies:
+      - cron
+    recommends:
+      - systemd
+    bindir: /usr/bin
