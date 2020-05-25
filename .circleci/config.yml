@@ -1,77 +1,75 @@
 version: 2.1
-
 workflows:
   main:
     jobs:
-      - build:
+      - test:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
-      - publish-github:
-          context: deploy-public
+      - build-binaries:
           filters:
-            branches:
-              ignore: /.*/
             tags:
               only: /^v\d+\.\d+\.\d+$/
-          requires:
-            - build
-
 jobs:
-  build:
+  test:
     docker:
-      - image: cimg/go:1.13
+      - image: cimg/go:1.14
     environment:
       CGO_ENABLED: 0
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "src/go.sum" }}
       - run:
-          name: "Compile Binary"
+          name: "Download Dependancies"
+          command: cd src && go mod download
+      - run:
+          name: "Run Tests"
+          command: cd src && go test
+      - save_cache:
+          key: go-mod-v1-{{ checksum "src/go.sum" }} 
+          paths:
+            - "/go/pkg/mod"
+  build-binaries:
+    parameters:
+      publish:
+        type: boolean
+        default: false
+    docker:
+      - image: cibuilds/goreleaser:0.120
+    steps:
+      - checkout
+      - run:
+          name: "Build and Optionally Publish Binaries"
           command: |
-            if [ ! -z "$CIRCLE_TAG" ]; then
-              go build -ldflags "-X main.version=${CIRCLE_TAG}" .
+            if [[ $CIRCLE_TAG != "" ]];then
+              cd src && goreleaser
             else
-              go build
+              cd src && goreleaser --snapshot --skip-publish --rm-dist
             fi
       - run:
           name: "Run File Tests"
           command: |
-            if ./md-proofer lint good-test-files/; then
+            src/dist/md-proofer_linux_amd64/md-proofer version
+
+            if src/dist/md-proofer_linux_amd64/md-proofer lint good-test-files/; then
               echo "md-proofer passed the files. Continue on."
             else
               echo "The tests failed, which it shouldn't. Something is wrong."
               exit 1
             fi
 
-            if ./md-proofer lint bad-test-files/; then
+            if src/dist/md-proofer_linux_amd64/md-proofer lint bad-test-files/; then
               echo "md-proofer returned an exit code of 0, which shouldn't be the case."
               exit 1
             else
               echo "The tests failed, which is what we expected. Continue on."
             fi
 
-            if ./md-proofer lint good-test-files/ bad-test-files/; then
+            if src/dist/md-proofer_linux_amd64/md-proofer lint good-test-files/ bad-test-files/; then
               echo "md-proofer returned an exit code of 0, which shouldn't be the case."
               exit 1
             else
               echo "Some of the tests failed, which is what we expected. Continue on."
             fi
-      - run:
-          name: "Prepare Binaries"
-          command: |
-            mkdir binaries
-            tar cfz ./binaries/md-proofer--${CIRCLE_TAG}--linux-amd64.tar.gz ./md-proofer
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./binaries
-
-  publish-github:
-    docker:
-      - image: cibuilds/github:0.13.0
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: "Publish Release on GitHub"
-          command: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./binaries/
