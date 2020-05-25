@@ -10,6 +10,7 @@ workflows:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
+          context: main
 jobs:
   test:
     docker:
