@@ -24,7 +24,7 @@ var versionCmd = &cobra.Command{
 
 			res, _ := latest.Check(githubTag, version)
 
-			fmt.Printf("Markdown Proofer v%s\n", version)
+			fmt.Printf("Markdown Proofer %s\n", version)
 
 			if res.Outdated {
 				fmt.Printf("An update is available (v%s). Please consider upgrading.", res.Current)
