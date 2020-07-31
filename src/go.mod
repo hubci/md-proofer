@@ -1,5 +1,7 @@
 module github.com/felicianotech/md-proofer
 
+go 1.14
+
 require (
 	github.com/BurntSushi/toml v0.3.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible // indirect
