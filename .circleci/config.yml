@@ -28,16 +28,16 @@ jobs:
       - run:
           name: "Compile Binary"
           command: |
-            cd src
+            cd ./mdproofer
             if [ ! -z "$CIRCLE_TAG" ]; then
-              go build -ldflags "-X main.version=${CIRCLE_TAG}" .
+              go build -o md-proofer -ldflags "-X main.version=${CIRCLE_TAG}" .
             else
-              go build
+              go build -o md-proofer
             fi
       - run:
           name: "Run File Tests"
           command: |
-            cd src
+            cd ./mdproofer
             if ./md-proofer lint ../good-test-files/; then
               echo "md-proofer passed the files. Continue on."
             else
@@ -61,13 +61,13 @@ jobs:
       - run:
           name: "Prepare Binaries"
           command: |
-            cd src
+            cd ./mdproofer
             mkdir binaries
             tar cfz ./binaries/md-proofer--${CIRCLE_TAG}--linux-amd64.tar.gz ./md-proofer
       - persist_to_workspace:
           root: .
           paths:
-            - ./src/binaries
+            - ./mdproofer/binaries
 
   publish-github:
     docker:
@@ -77,4 +77,4 @@ jobs:
           at: .
       - run:
           name: "Publish Release on GitHub"
-          command: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./src/binaries/
+          command: ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 -prerelease $CIRCLE_TAG ./mdproofer/binaries/
