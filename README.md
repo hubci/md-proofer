@@ -1,6 +1,7 @@
 # Markdown Proofer [![CircleCI Build Status](https://circleci.com/gh/felicianotech/md-proofer.svg?style=shield)](https://circleci.com/gh/felicianotech/md-proofer) [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/felicianotech/md-proofer/master/LICENSE)
 
 Tool to validate Markdown files.
+If you have ideas on how to make this tool better, please open an Issue.
 
 ## Installation
 
