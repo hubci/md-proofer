@@ -20,7 +20,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: cimg/go:1.14
+      - image: cimg/go:1.18.3
     environment:
       CGO_ENABLED: 0
     steps:
