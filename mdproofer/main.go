@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/spf13/viper"
 
-	"github.com/felicianotech/md-proofer/cmd"
+	"github.com/hubci/md-proofer/mdproofer/cmd"
 )
 
 var (
